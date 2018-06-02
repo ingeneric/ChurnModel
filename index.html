@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>Churn ANN</title>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport'  />
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+  <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+  <!-- CSS Files -->
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="assets/css/theme.css" rel="stylesheet" />
+  <link href="assets/css/style.css" rel="stylesheet" />
+</head>
+
+<body class="">
+  <div class="wrapper ">
+    <div class="main-panel">
+      <div class="panel-header"></div>
+      <div class="content">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+								<h5 class="card-category"><button class="btn btn-default btn-block" id="viewTestDataButton"><i class="fa fa-info-circle"></i> More Info</button></h5>
+								<h4 class="card-title">Churn Model</h4>
+              </div>
+              <div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-md-3">
+											<label for="testTrainSplitInput">Training set size as percentage</label>
+											<input id="testTrainSplitInput" class="form-control" type="number" step="0.1" min="0.1" max="1" value="0.8">
+											<div id="testTrainFeedback"></div>
+									</div>
+									<div class="col-md-3">
+											<label for="batchInput">Batch Size</label>
+											<input id="batchInput" class="form-control" type="number" step="1"  min="1" value="10">
+											<div id="batchFeedback"></div>
+									</div>
+									<div class="col-md-3">
+											<label for="epochInput">Epochs</label>
+											<input id="epochInput" class="form-control" type="number" step="1"  min="1" value="10">
+											<div id="epochFeedback"></div>
+									</div>
+									<div class="col-md-3">
+											<label for="updateInput">Update Rate</label>
+											<input id="updateInput" class="form-control" type="number" label="Number of batches done before graph is updated" step="1"  min="1" value="10" data-toggle="tooltip" data-placement="top" title="The graphs are updated after this number of batches">
+											<div id="updateFeedback"></div>
+									</div>
+								</div>
+                <div class="row">
+                  <div class="col-md-12 text-center">                    
+										<table class="table table-hover">
+											<thead class="text-primary">
+												<tr>
+													<th class="text-center">Epoch</th>
+													<th class="text-center">Batch</th>
+													<th class="text-center">Loss</th>
+													<th class="text-center">Accuracy</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td id="epoch">0</td>
+													<td id="batch">0</td>
+													<td id="loss">0</td>
+													<td id="acc">0</td>
+												</tr>
+											</tbody>
+										</table>
+                  </div>
+                </div>
+								<div class="row">
+									<div class="col-md-12 text-center">
+										<button class="btn btn-primary btn-block btn-lg" id='trainButton'>Train</button>
+									</div>
+								</div>
+              </div>
+            </div>
+          </div>
+        </div>
+		
+				<div class="row">
+					<div class="col-md-12">
+						<div class="card">
+							<div class="card-header">
+								<h4 class="card-title">Train Progress</h4>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-6 text-center">                    
+										<div id="lossChart"></div>
+									</div>
+									<div class="col-md-6 text-center">                    
+										<div id="accChart"></div>
+									</div>
+								</div>				
+							</div>
+						</div>
+					</div>
+				</div>
+		
+				<div class="row">
+        	<div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h4 class="card-title">Results</h4>
+              </div>
+              <div class="card-body">
+                <div class="row justify-content-center">
+									<div class="col-md-10">
+										<table class="table table-hover text-center">
+											<thead class="text-primary">
+												<tr>
+													<th></th>
+													<td class="text-center">Stayed Predicted</th>
+													<td class="text-center">Exited Predicted</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td class="text-primary">Stayed</td>
+													<td id="tn">N/A</td>
+													<td id="fp">N/A</td>
+												</tr>
+												<tr>
+													<td class="text-primary">Exited</td>
+													<td id="fn">N/A</td>
+													<td id="tp">N/A</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+                </div>
+								<div class="row justify-content-center">
+									<div class="col-md-10">
+										<br>
+										<table class="table table-hover text-center">
+											<thead class="text-primary">
+												<tr>
+													<td class="text-center" title="How often the classifier is correct">Accuracy</th>
+													<td class="text-center" title="How often the classifier is wrong">Misclassification Rate</th>
+													<td class="text-center" title="How often does it correcty predict that the customer exited">True Positive Rate</th>
+													<td class="text-center" title="How often does it correctly predict that the customer exi">False Positive Rate</th>
+													<td class="text-center">Specificity</th>
+													<td class="text-center">Precision</th>
+													<td class="text-center">Prevalence</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td id="accuracy">N/A</td>
+													<td id="misscalc">N/A</td>
+													<td id="tprate">N/A</td>
+													<td id="fprate">N/A</td>
+													<td id="specificity">N/A</td>
+													<td id="precision">N/A</td>
+													<td id="prevalence">N/A</td>								
+												</tr>
+											</tbody>
+										</table>
+									</div>
+                </div>					
+              </div>
+            </div>
+          </div>
+        </div>
+		
+				<div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h4 class="card-title">Make a prediction</h4>
+              </div>
+              <div class="card-body">
+                <div class="row justify-content-center">
+									<div class="col-md-10">
+										<form>
+						  				<div class="form-row">
+												<div class="form-group col-2">
+													<label for="creditScoreInput">Credit Score</label>
+													<input type="number" class="form-control" id="creditScoreInput">
+												</div>						  
+												<div class="form-group col-3">
+													<label for="countrySelect">Geography</label>
+													<select class="form-control" id="countrySelect">
+														<option>France</option>
+														<option>Germany</option>
+														<option>Spain</option>
+													</select>
+												</div>
+												<div class="form-group col-2">
+													<label for="genderSelect">Gender</label>
+													<select class="form-control" id="genderSelect">
+														<option>Male</option>
+														<option>Female</option>									  
+													</select>
+												</div>
+												<div class="form-group col-2">
+													<label for="ageInput">Age</label>
+													<input type="number" class="form-control" id="ageInput">
+												</div>
+												<div class="form-group col-3">
+													<label for="tenureInput">Tenure</label>
+													<input type="number" class="form-control" id="tenureInput">
+												</div>
+						  				</div>
+											<div class="form-row">
+												<div class="form-group col-3">
+													<label for="balanceInput">Balance</label>
+													<input type="number" class="form-control" id="balanceInput">
+												</div>
+												<div class="form-group col-2">
+													<label for="productsInput"># of Products</label>
+													<input type="number" class="form-control" id="productsInput">
+												</div>								
+												<div class="form-group col-2">
+													<label for="creditCardSelect">Credit Card</label>
+													<select class="form-control" id="creditCardSelect">
+														<option value=1>Yes</option>
+														<option value=0>No</option>									  
+													</select>
+												</div>
+												<div class="form-group col-2">
+													<label for="activeMemberSelect">Active</label>
+													<select class="form-control" id="activeMemberSelect">
+														<option value=1>Yes</option>
+														<option value=0>No</option>									  
+													</select>
+												</div>
+												<div class="form-group col-3">
+													<label for="estSalaryInput">Estimated Salary</label>
+													<input type="number" class="form-control" id="estSalaryInput">
+												</div>
+											</div>
+											<div class="form-row">
+												<div class="form-group col-12">
+													<button class="btn btn-lg btn-block btn-primary" id="predictButton" disabled>Predict</button>
+												</div>
+											</div>
+										</form>
+									</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+	  
+	  <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+				<div class="modal-content">
+			  	<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Prediction Result</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">		
+				  		<span aria-hidden="true">&times;</span>
+						</button>
+			  	</div>
+					<div class="modal-body text-center">
+						<h1 id="predictionResult">1.0</h1>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+		  </div>
+		</div>
+
+    <footer class="footer">
+    	<div class="container-fluid">
+      	<nav>
+        	<ul>
+          </ul>
+				</nav>
+        <div class="copyright">
+        	&copy;
+          <script>
+          	document.write(new Date().getFullYear())
+          </script>, Created by           
+            <a href="" target="_blank">CA Bezuidenhout</a>.
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+<!--   Core JS Files   -->
+<script src="assets/js/core/jquery.min.js"></script>
+<script src="assets/js/core/popper.min.js"></script>
+<script src="assets/js/core/bootstrap.min.js"></script>
+<script src="assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+
+<!-- Plotly -->
+<script src="assets/js/plugins/plotly.min.js"></script>
+<!--  Notifications Plugin    -->
+<script src="assets/js/plugins/bootstrap-notify.js"></script>
+
+<!-- My excel -->
+<script src="assets/js/plugins/myexcel/jszip.js"></script>
+<script src="assets/js/plugins/myexcel/FileSaver.js"></script>
+<script src="assets/js/plugins/myexcel/myexcel.js"></script>
+
+
+<script src="tensorflow.js"> </script>
+<script src='data.js'></script>
+<script src="ui.js"></script>
+<script src="preprocessing.js"></script>
+<script src="script.js"></script>
+</html>

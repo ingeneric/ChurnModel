@@ -1,0 +1,31 @@
+.cp { 
+  -moz-osx-font-smoothing: grayscale; 
+  -webkit-backface-visibility: hidden; 
+  backface-visibility: hidden; 
+  -webkit-transform: translateZ( 0 ); 
+  transform: translateZ( 0 ); 
+  transition: -webkit-transform .25s ease-out; 
+  transition: transform .25s ease-out; 
+  transition: transform .25s ease-out, -webkit-transform .25s ease-out; 
+  
+}
+.cp:hover, .cp:focus { 
+  -webkit-transform: scale( 1.05 ); 
+  transform: scale( 1.05 ); 
+  background-color: #2a5788;
+  color: white;
+  transition: background-color .15s ease-in-out;
+}
+.cp:active { -webkit-transform: scale( .90 ); transform: scale( .90 ); }
+
+.btn-info {
+  background: #2a5788;
+}
+
+.btn-info:hover {
+  background: #204065;
+}
+
+.text-invalid {
+  color: red;
+}
