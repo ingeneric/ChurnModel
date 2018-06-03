@@ -23,6 +23,13 @@ const ui = {
     title: 'Accuracy over Batches'
   },
 
+  resetPlots: function() {
+    this.lossX.length = 0;
+    this.lossY.length  = 0;
+    this.accX.length  = 0;
+    this.accY.length = 0;
+  },
+
   createLossPlot: function() {
     let trace = {
       x: this.lossX,
@@ -182,12 +189,39 @@ const ui = {
   },
   setPrevalence: function( prevalence ) {
     document.getElementById('prevalence').innerText = prevalence;
+  },
+  activatePredictButton: function() {
+    document.getElementById('predictButton').disabled = false;
+  },
+
+  getPredictionX: function() {
+    let predictX = [];
+    let predictRow =[];
+
+    let geography = document.getElementById('countrySelect').value;
+    let age = Number(document.getElementById('ageInput').value);
+    let balance = Number(document.getElementById('balanceInput').value);
+    let creditScore = Number(document.getElementById('creditScoreInput').value);
+    let estimatedSalary = Number(document.getElementById('estSalaryInput').value);
+    let gender = document.getElementById('genderSelect').value;
+    let hasCrCard = Number(document.getElementById('creditCardSelect').value)
+    let isActiveMember = Number(document.getElementById('activeMemberSelect').value)
+    let numOfProducts = Number(document.getElementById('productsInput').value)
+    let tenure = Number(document.getElementById('tenureInput').value)
+
+    predictRow.push( preprocessing.isSpain( geography ) );
+    predictRow.push( preprocessing.isGermany( geography ) );
+    predictRow.push( age );
+    predictRow.push( balance );
+    predictRow.push( creditScore );
+    predictRow.push( estimatedSalary );
+    predictRow.push( preprocessing.isMale( gender ) );
+    predictRow.push( hasCrCard );
+    predictRow.push( isActiveMember );
+    predictRow.push( numOfProducts );
+    predictRow.push( tenure );
+    predictX.push(predictRow);
+
+    return predictX;
   }
-
-
-  /*
-  
-    
-
-    document.getElementById('predictButton').disabled = false;*/
 };

@@ -13,7 +13,7 @@ let updateRate = 10;
 
 document.getElementById('predictButton').addEventListener( 'click', (e) => {
   e.preventDefault();
-  ui.showPrediction( 'test' );
+  ui.showPrediction( predict() );
 })
 
 document.getElementById('trainButton').addEventListener( 'click', (e) => {
@@ -30,6 +30,7 @@ window.onresize = function() {
 }
 
 async function train() {
+  ui.resetPlots();
   preprocessing.generateTestTrainSplit( data, ui.getTestTrainSplit() );
   preprocessing.setFeatureStats(X, statColumns)
   const trainX = preprocessing.getTrainX(X);
@@ -123,5 +124,16 @@ async function test() {
     ui.setPrevalence((actualYes.get() / total).toFixed(3));
   });
 
+  ui.activatePredictButton();
+
   console.log(Date.now());  
+}
+
+async function predict() {
+  const predictModel = await tf.loadModel('localstorage://' + MODEL_NAME);
+
+  const predictX = ui.getPredictionX();
+
+  const prediction = predictModel.predict( preprocessing.getXTensor( preprocessing.getNormalisedX(predictX) ) );
+  ui.showPrediction( prediction.get(0,0).toFixed(3) );
 }
