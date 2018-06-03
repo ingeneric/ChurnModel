@@ -133,7 +133,10 @@ async function predict() {
   const predictModel = await tf.loadModel('localstorage://' + MODEL_NAME);
 
   const predictX = ui.getPredictionX();
+  const normalisedX = preprocessing.getNormalisedX( predictX );
+  const predictTensor = preprocessing.getXTensor( predictX );
 
-  const prediction = predictModel.predict( preprocessing.getXTensor( preprocessing.getNormalisedX(predictX) ) );
-  ui.showPrediction( prediction.get(0,0).toFixed(3) );
+  const prediction = predictModel.predict( predictTensor );
+  const probabilityOfLeaving = prediction.get(0,0);
+  ui.showPrediction( probabilityOfLeaving.toFixed(3) );
 }
